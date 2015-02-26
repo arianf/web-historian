@@ -43,7 +43,7 @@ exports.handleRequest = function (req, res) {
           }
         });
       }else{
-        fs.exists(archive.paths.archivedSites + req.url, function(exists){
+        archive.isURLArchived(req.url, function(exists){
           if(exists){
             fs.readFile(archive.paths.archivedSites + req.url, function(err, data){
               if(err) {
@@ -58,23 +58,21 @@ exports.handleRequest = function (req, res) {
             res.writeHead(404, mime);
             res.end('File not found');
           }
-        });
+        })
+        // fs.exists(archive.paths.archivedSites + req.url, function(exists){
+
+        // });
         // If req url exists in /sites/archives/
       }
     });
   }//----- End GET Request -----
 
   if(req.method === 'POST'){
+    console.log("POST");
     if(req.url === '/index.html'){
       req.on('data', function(data){
         var newData = queryString.parse(data.toString('utf-8'));
-        fs.appendFile(archive.paths.list, newData.url+'\n', function(err){
-          if(err){
-            console.log(err);
-          }else{
-            console.log("The file was saved!");
-          }
-        });
+        archive.addUrlToList(newData.url);
         res.writeHead(302);
         res.end();
       });
