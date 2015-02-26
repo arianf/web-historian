@@ -33,25 +33,30 @@ exports.readListOfUrls = function(callback){
   });
 };
 
-exports.isUrlInList = function(url){
+exports.isUrlInList = function(url, callback){
   var exists = false;
   exports.readListOfUrls(function(urls){
     exists = (urls.indexOf(url) !== -1);
+    callback(exists);
   });
-  return exists;
 };
 
 exports.addUrlToList = function(url){
-  fs.appendFile(exports.paths.list, url+'\n', function(err){
-    if(err){
-      console.log(err);
-    }else{
-      console.log("The file was saved!");
+  exports.isUrlInList(url, function(exists){
+    if(!exists){
+      fs.appendFile(exports.paths.list, url+'\n', function(err){
+        if(err){
+          console.log(err);
+        }else{
+          console.log("The file was saved!");
+        }
+      });
     }
   });
 };
 
 exports.isURLArchived = function(url, callback){
+  url = '/' + url;
   fs.exists(exports.paths.archivedSites + url, function(exists){
     callback(exists);
   });

@@ -31,9 +31,9 @@ exports.handleRequest = function (req, res) {
 
   //----- GET request -----
   if(req.method === 'GET'){
-    fs.exists('web/public' + req.url, function(exists){
+    fs.exists(archive.paths.siteAssets + req.url, function(exists){
       if(exists){
-        fs.readFile('web/public' + req.url, function(err, data){
+        fs.readFile(archive.paths.siteAssets + req.url, function(err, data){
           if(err) {
             res.writeHead(500, mime);
             res.end('File not found');
@@ -59,10 +59,6 @@ exports.handleRequest = function (req, res) {
             res.end('File not found');
           }
         })
-        // fs.exists(archive.paths.archivedSites + req.url, function(exists){
-
-        // });
-        // If req url exists in /sites/archives/
       }
     });
   }//----- End GET Request -----
@@ -73,8 +69,16 @@ exports.handleRequest = function (req, res) {
       req.on('data', function(data){
         var newData = queryString.parse(data.toString('utf-8'));
         archive.addUrlToList(newData.url);
-        res.writeHead(302);
-        res.end();
+
+        archive.isURLArchived(newData.url, function(exists){
+          console.log(exists);
+          if(exists){
+            res.writeHead(302, {'location': '/' + newData.url});
+          }else{
+            res.writeHead(302, {'location': 'loading.html'});
+          }
+          res.end();
+        });
       });
     }
 
