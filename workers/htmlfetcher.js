@@ -3,7 +3,7 @@
 
 
 var archives = require('../helpers/archive-helpers');
-var http = require('request');
+var http = require('http-request');
 
 
 // open sites list,
@@ -16,19 +16,23 @@ var http = require('request');
 archives.readListOfUrls(function(urls){
   urls.forEach(function(url){
     archives.isURLArchived(url, function(exists){
+      console.log(url);
       if(!exists){
         http.get({
-          url: 'http://' + url,
+          url: url,
           progress: function (current, total) {
             console.log('downloaded %d bytes from %d', current, total);
           }
         },
-        url,
+        archives.paths.archivedSites + '/' + url,
         function(err, res){
           if(err){
-            console.error(err);
+            console.log("SOMETHING WENT WRONG!");
+          }else{
+            console.log("SOMETHING WENT RIGHT!");
+            console.log(res.code, res.headers, res.file);
           }
-          console.log(res.code, res.headers, res.file);
+
         });
       }
     });
