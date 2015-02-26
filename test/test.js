@@ -116,6 +116,7 @@ describe("html fetcher helpers", function(){
       function() { return resultArray; },
       function(){
         expect(resultArray).to.deep.equal(urlArray);
+        console.log(resultArray, urlArray);
         done();
     });
   });
